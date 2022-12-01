@@ -1,0 +1,5 @@
+---
+# Minimum settings
+cluster_name: ${CLUSTER_NAME}
+
+settings: test
