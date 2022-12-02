@@ -3,6 +3,7 @@ import logging
 import os
 import argparse
 import shutil
+from fnmatch import fnmatch
 
 
 def main():
@@ -27,8 +28,16 @@ def main():
     if need_to_set_license_file:
         shutil.copy("LICENSE", folder)
 
-    all_full_path_files = [os.path.join(dirpath, f) for (dirpath, dirnames, filenames)
-                           in os.walk(folder) for f in filenames]
+    all_full_path_files = []
+
+    repo_length = len(folder.split('/'))
+
+    for path, subdirs, files in os.walk(folder):
+        for name in files:
+            if len(path.split('/')) > repo_length:
+                if path.split('/')[repo_length] != "target" and path.split('/')[repo_length] != ".git" \
+                        and path.split('/')[repo_length] != ".idea":
+                    all_full_path_files.append(os.path.join(path, name))
 
     for file in all_full_path_files:
         logger.debug("Treating file: %s" % file)
@@ -54,7 +63,7 @@ def main():
 
         logger.info("Finished to treat file: %s" % file)
 
-    logger.info("Finished to apply license to %s" %  folder)
+    logger.info("Finished to apply license to %s" % folder)
 
 
 if __name__ == "__main__":
@@ -65,7 +74,7 @@ if __name__ == "__main__":
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
+    console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
 
     logger.addHandler(console_handler)
